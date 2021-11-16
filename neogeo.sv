@@ -298,6 +298,8 @@ localparam CONF_STR = {
 	"d5o2,Vertical Crop,Disabled,216p(5x);",
 	"d5o36,Crop Offset,0,2,4,8,10,12,-12,-10,-8,-6,-4,-2;",
 	"o78,Scale,Normal,V-Integer,Narrower HV-Integer,Wider HV-Integer;",
+	"o9C,Analog Video H-Pos,0,-1,-2,-3,-4,-5,-6,-7,8,7,6,5,4,3,2,1;",
+	"oDG,Analog Video V-Pos,0,-1,-2,-3,-4,-5,-6,-7,8,7,6,5,4,3,2,1;",
 	"-;",
 	"O56,Stereo Mix,none,25%,50%,100%;",
 	"-;",
@@ -1910,10 +1912,30 @@ video_mixer #(.LINE_LENGTH(320), .HALF_DEPTH(0), .GAMMA(1)) video_mixer
 	.B(b),
 
 	// Positive pulses.
-	.HSync(hs),
-	.VSync(vs),
+	.HSync(hs_rs),
+	.VSync(vs_rs),
 	.HBlank(hblank),
 	.VBlank(vblank)
 );
+
+wire hs_rs, vs_rs;
+wire [3:0]  voffset = status[48:45];
+wire [3:0]  hoffset = status[44:41];
+
+jtframe_resync jtframe_resync
+(
+  .clk(clk_sys),
+  .pxl_cen(ce_pix),
+  .hs_in(hs),
+  .vs_in(vs),
+  .LVBL(vblank),
+  .LHBL(hblank),
+  .hoffset(hoffset),
+  .voffset(voffset),
+  .hs_out(hs_rs),
+  .vs_out(vs_rs)
+);
+
+
 
 endmodule
